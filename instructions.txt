@@ -1,0 +1,370 @@
+Starting the API: npm start
+The server runs on port 6969.
+
+------------------------------------------------------------------------------------------------------------------------
+Endpoints
+------------------------------------------------------------------------------------------------------------------------
+/brawler
+
+Get the entire list of brawlers.
+NOTE: to save space in kinggolem's repository, Bull and Frank are the only available brawlers. In the final version all
+brawlers will be available.
+
+Response description:
+    name            The ID of the brawler. ID values are used when calling other endpoints.
+    displayName     The brawler's name as it appears in-game. This value should be the one shown to the user.
+
+Example:
+[
+    {
+        "name":"bull",
+        "displayName":"Bull"
+    },
+    {
+        "name":"frank",
+        "displayName":"Frank"
+    }
+]
+
+------------------------------------------------------------------------------------------------------------------------
+/brawler/:brawler
+
+Get data about a specific brawler. Must be called using a brawler's name, not their displayName.
+
+Response description:
+    name            The ID of the brawler.
+    displayName     The brawler's name as it appears in-game.
+    rarity          The brawler's rarity. 0 = Trophy Road, 1 = Rare, 2 = Super Rare, 3 = Epic, 4 = Mythic,
+                    5 = Legendary, 6 = Chromatic. Returned as an integer to allow for comparisons between rarities.
+    skins           Array of the brawler's skins.
+
+        name            The ID of the skin.
+        displayName     The skin's name as it appears in-game.
+    
+    image           Path to the brawler's portrait image. See the /image endpoint for more information.
+
+Example: /brawler/frank -> Get data for Frank
+{
+    "name":"frank",
+    "displayName":"Frank",
+    "rarity":3,
+    "skins":[
+        {
+            "name":"frankdefault",
+            "displayName":"Frank"
+        },
+        {
+            "name":"frankcaveman",
+            "displayName":"Caveman Frank"
+        },
+        {
+            "name":"hammerdudedj",
+            "displayName":"DJ Frank"
+        },
+        {
+            "name":"hammerdudegold",
+            "displayName":"True Gold Frank"
+        },
+        {
+            "name":"hammerdudesilver",
+            "displayName":"True Silver Frank"
+        },
+        {
+            "name":"hammerdudexmas",
+            "displayName":"Holiday Party Frank"
+        }
+    ],
+    "image":"portraits/portrait_frank.png"
+}
+
+------------------------------------------------------------------------------------------------------------------------
+/skin/:brawler/:skin
+
+Get data about a specific brawler's skin.
+
+Response description:
+    name            The ID of the skin.
+    displayName     The skin's name as it appears in-game.
+    cost            How many resources it costs to buy the skin.
+    currency        Which type of currency is used to buy the skin. If the skin is free, currency will be returned as
+                    an empty string.
+    features        The skin's custom features. Skins with no features such as default skins will give an empty array.
+    limited         Whether or not the skin is in the regular rotation. Limited skins are not available often and some
+                    are no longer obtainable.
+    group           Which group a skin belongs to. Skins not in a group will have an empty string.
+    image           Path to the skin's image. See the /image endpoint for more information.
+    highresImage    Some skins have a higher resolution image available. This object shows the details of the image.
+
+        exists          Whether or not the skin has a higher resolution image available.
+        image           Path to the skin's higher resolution image.
+
+
+Example: /skin/bull/bulldudeox -> Get data for Space Ox Bull
+{
+    "name":"bulldudeox",
+    "displayName":"Space Ox Bull",
+    "cost":149,
+    "currency":"Gems",
+    "features":[
+        "Brawler Model",
+        "Texture",
+        "Animations",
+        "Effects",
+        "Voice"
+    ],
+    "limited":true,
+    "group":"Lunar Brawl 2021",
+    "image":"skins/bull/bulldudeox.png",
+    "highresImage":{
+        "exists":true,
+        "image":"skins/bull/bullguydefault_highres.png"
+    }
+}
+
+------------------------------------------------------------------------------------------------------------------------
+/gamemode
+
+Get the entire list of game modes.
+NOTE: to save space in kinggolem's repository, Gem Grab, Knockout, and Bounty are the only available game modes. In the
+final version all game modes will be available.
+
+Response description:
+    name            The ID of the game mode.
+    displayName     The game mode's name as it appears in-game.
+
+Example:
+[
+    {
+        "name":"gemgrab",
+        "displayName":"Gem Grab"
+    },
+    {
+        "name":"knockout",
+        "displayName":"Knockout"
+    },
+    {
+        "name":"bounty",
+        "displayName":"Bounty"
+    }
+]
+
+------------------------------------------------------------------------------------------------------------------------
+/gamemode/:gamemode
+
+Get data about a specific game mode.
+
+Response description:
+    name            The ID of the game mode.
+    displayName     The game mode's name as it appears in-game.
+    data            Additional attributes of the game mode which have no effect on its map rotation.
+
+        image           Path to the game mode's icon. See the /image endpoint for more information.
+        backgroundColor Color of backgrounds relating to the game mode.
+        textColor       Color of text relating to the game mode.
+    
+    maps            List of all the maps which appear in this game mode.
+
+        name            The ID of the map.
+        displayName     The map's name as it appears in-game.
+
+Example: /gamemode/bounty -> Get data for the Bounty game mode
+{
+    "name":"bounty",
+    "displayName":"Bounty",
+    "data":{
+        "image":"gamemodes/bounty.png",
+        "backgroundColor":"#00CFFF",
+        "textColor":"#24D6FF"
+    },
+    "maps":[
+        {
+            "name":"dont-turn-around",
+            "displayName":"Don't turn around"
+        },
+        {
+            "name":"dry-season",
+            "displayName":"Dry Season"
+        },
+        
+        ...
+        
+        {
+            "name":"layer-cake",
+            "displayName":"Layer Cake"
+        }
+    ]
+}
+
+------------------------------------------------------------------------------------------------------------------------
+/map/:map
+
+Get data about a specific map. The map's game mode is not required in the search.
+
+Response description:
+    name            The ID of the map.
+    displayName     The map's name as it appears in-game.
+    gameMode        The game mode that the map appears in.
+    times           The times when the map appears. See Season Times at the end for more information on times.
+
+        start       The time when the map appears.
+        duration    How long the map lasts for before switching.
+    
+    next            How long from now when the map will appear.
+
+Example: /map/shooting-star -> Get data for the map Shooting Star
+{
+    "name":"shooting-star",
+    "displayName":"Shooting Star",
+    "gameMode":"bounty",
+    "times":[
+        {
+            "start":{
+                "season":0,
+                "hour":126,
+                "minute":0,
+                "second":0,
+                "hoursPerSeason":336,
+                "maxSeasons":2
+            },
+            "duration":{
+                "season":0,
+                "hour":24,
+                "minute":0,
+                "second":0,
+                "hoursPerSeason":336,
+                "maxSeasons":2
+            }
+        }
+    ],
+    "next":{
+        "season":0,
+        "hour":294,
+        "minute":30,
+        "second":45,
+        "hoursPerSeason":336,
+        "maxSeasons":2
+    },
+    "image":"maps/bounty/shooting-star.png"
+}
+
+------------------------------------------------------------------------------------------------------------------------
+/event/current
+
+Get all currently active events.
+
+Response description
+    time            The current time in the season. See Season Times at the end for more information on times.
+    events          Array of all events which are currently active at the time. Each element in the array represents
+                    an event slot.
+
+        gameMode        The game mode active in the event slot. See /gamemode for more information on this object.
+        map             The map active in the event slot. See /map for more information on this object.
+        timeLeft        The amount of time left until the game mode and map in this event slot switch.
+
+Example:
+{
+    "time":{
+        "season":0,
+        "hour":157,
+        "minute":56,
+        "second":3,
+        "hoursPerSeason":336,
+        "maxSeasons":2
+    },
+    "events":[
+        {
+            "gameMode":{
+                "name":"gemgrab",
+                "displayName":"Gem Grab",
+                "data":{
+                    "backgroundColor":"#9A3DF3",
+                    "textColor":"#D852FF"
+                }
+            },
+            "map":{
+                "name":"glass-half-full",
+                "displayName":"Glass Half Full"
+            },
+            "timeLeft":{
+                "season":0,
+                "hour":10,
+                "minute":3,
+                "second":56,
+                "hoursPerSeason":336,
+                "maxSeasons":2
+            }
+        },
+        {
+            "gameMode":{
+                "name":"knockout",
+                "displayName":"Knockout",
+                "data":{
+                    "backgroundColor":"#F7831C",
+                    "textColor":"#FD9B0E"
+                }
+            },
+            "map":{
+                "name":"goldarm-gulch",
+                "displayName":"Goldarm Gulch"
+            },
+            "timeLeft":{
+                "season":0,
+                "hour":16,
+                "minute":3,
+                "second":56,
+                "hoursPerSeason":336,
+                "maxSeasons":2
+            }
+        }
+    ]
+}
+
+------------------------------------------------------------------------------------------------------------------------
+/event/upcoming
+
+Get the next event that will start in each event slot.
+
+Response description:
+Returns an object in the exact same format as /event/current.
+The only difference is that the value of timeLeft, in this endpoint, should be interpreted as time until the event
+starts, not time until the event ends.
+
+------------------------------------------------------------------------------------------------------------------------
+/event/time/:hour/:minute/:second
+
+Get the events that will be active at a specific time in the season. See Season Times at the end for more information
+on times.
+
+Response description:
+Returns an object in the exact same format as /event/current.
+
+Example: /event/time/210/6/28 -> Get events that will be active at 210:06:28 
+
+------------------------------------------------------------------------------------------------------------------------
+/event/later/:hour/:minute/:second
+
+Get the events that will be active at a later time from now. See Season Times at the end for more information on times.
+
+Response description:
+Returns an object in the exact same format as /event/current.
+
+Example: /event/later/24/0/0 -> Get events that will be active 24 hours from now
+
+------------------------------------------------------------------------------------------------------------------------
+/image/:image
+
+Get an image of a brawler, skin, game mode, or map. The path to the image can be obtained from an endpoint which
+returns data for a brawler, skin, game mode, or map.
+
+Example: /image/skins/bull/bulldudeox.png -> Get the image of Space Ox Bull
+
+------------------------------------------------------------------------------------------------------------------------
+More Info on Season Times
+
+To prevent time zone conflicts, times used in the API are measured relative to the season reset and not to the world
+clock. The current map rotation repeats itself every 2 weeks, or 336 hours (the ladder season used to also reset at
+this time so that is why it is called season reset). All times used in the API, except for those which describe time
+left or duration are measured relative to the season reset. The highest value these can have are 335 hours, 59 minutes,
+and 59 seconds because a value of 336 hours would be equal to 0 hours since the map rotation repeats itself.
+
+------------------------------------------------------------------------------------------------------------------------
